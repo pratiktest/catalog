@@ -51,7 +51,7 @@ spec:
     description: This workspace is where catlin output will be stored
   steps:
     - name: catlin
-      image: gcr.io/tekton-releases/dogfooding/catlin@sha256:879cfd51c8e77c02a44509b8a67f9976d26a77f6b93dd7686993b8797ae3938a
+      image: gcr.io/tekton-releases/dogfooding/catlin:v20230721-0755082305@sha256:8db5e290b9a1b7794c536dbc826bb9cf3eeb82c41b251b7caee12204bcfb6664
       env:
       - name: OUTPUT_FILE
         value: $(params.outputFile)
