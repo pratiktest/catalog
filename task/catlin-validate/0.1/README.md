@@ -52,7 +52,7 @@ A workspace that contains output of catlin validate. Output of each catlin valid
 * catlin-status contains the final catlin-validate task result Success, Warning or Failure  which will depend on the cumulative output of catlin validate on all tasks
     * Final result will be success if there is no error and no warning for any of the task specified in [inputFile](#inputfile). 
     * Final result will be warning if there is no error and a warning for any of the task specified in [inputFile](#inputfile).
-    * Final result will be error if there an error in even one of the tasks specified in [inputFile](#inputfile)
+    * Final result will be failure if there an error in even one of the tasks specified in [inputFile](#inputfile)
     * Output for each catlin validate commmand is stored in [outFile](#outputfile) in [catlin-output](#catlin-output) workspace
 
 
@@ -139,4 +139,4 @@ ERROR: Step "echo" uses image "alpine" which must be tagged with a specific vers
 -------catlin output end--------
 ```
 
-* Catlin output logs are also stored in [$(params.outputFile)](#outputfile) in [catlin-output](#catlin-output) workspace. This workspace can be passed on to other tasks in case other tasks need to consume this output. An example would be git-comment task can uses this workspace to post the catlin output logs to a PR
+* Catlin output is also stored in [$(params.outputFile)](#outputfile) in [catlin-output](#catlin-output) workspace. This workspace can be passed on to other tasks in case other tasks need to consume this output. An example would be binding the output workspace to a workspace in git-comment to post the catlin output as a comment for a PR of a new task submission

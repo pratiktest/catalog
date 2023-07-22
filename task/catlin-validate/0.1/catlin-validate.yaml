@@ -36,8 +36,8 @@ spec:
   results:
     - name: catlin-status
       description: |
-        final status of catlin command. If command succeeds status will be set to 'success', if command fails status will be set to 'failure'
-        These status matches the github status checks and can be injected to the github-set-status task to report status back to a github PR
+        final status of catlin command. If all catlin validate command succeeds status will be set to 'success', if any one command validate command fails 
+        status will be set to 'failure', If there is no failure and atleast one catline validate command is warning the status will be set to 'warning'
   workspaces:
   - name: source
     description: |
@@ -51,7 +51,7 @@ spec:
     description: This workspace is where catlin output will be stored
   steps:
     - name: catlin
-      image: gcr.io/tekton-releases/dogfooding/catlin:latest
+      image: gcr.io/tekton-releases/dogfooding/catlin@sha256:879cfd51c8e77c02a44509b8a67f9976d26a77f6b93dd7686993b8797ae3938a
       env:
       - name: OUTPUT_FILE
         value: $(params.outputFile)
