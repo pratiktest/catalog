@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: catlin-run-success
+  name: catlin-run-multiple
 spec:
   taskRef:
     name: catlin-validate
@@ -14,10 +14,12 @@ spec:
       emptyDir: {}
     - name: catlin-input
       configmap:
-        name: catlin-input
+        name: catlin-input-multiple
     - name: source
       configmap:
-        name: source-success
+        name: source-multiple
         items:
         - key: "hello.yaml"
           path: "task/hello/0.1/hello.yaml"
+        - key: "bye.yaml"
+          path: "task/bye/0.1/bye.yaml"

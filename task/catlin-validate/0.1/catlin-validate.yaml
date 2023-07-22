@@ -33,6 +33,12 @@ spec:
         'catlin validate $(workspaces.source.path)/task/git-clone/0.9/git-clone.yaml >> $(workspaces.catlin-output.path)/output.txt'
         'catlin validate $(workspaces.source.path)/task/git-clone/0.1/git-comment.yaml >> $(workspaces.catlin-output.path)/output.txt'
       type: string
+    - name: ignoreWarnings
+      description: |
+        Ignores any warnings in catlin output. 
+        If catlin output has only success and warnings, all warnings are ignored and final catlin output will be success
+      type: string
+      default: "false"
   results:
     - name: catlin-status
       description: |
@@ -57,32 +63,46 @@ spec:
         value: $(params.outputFile)
       - name: INPUT_FILE
         value: $(params.inputFile)
+      - name: CATLIN_OUTPUT_WORKSPACE_PATH
+        value: $(workspaces.catlin-output.path)
+      - name: IGNORE_WARNINGS
+        value: $(params.ignoreWarnings)
       workingDir: $(workspaces.catlin-input.path)
       script: |
         #!/usr/bin/env bash
-        rm -rf "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
+        rm -rf "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE"
         while IFS="" read -r p || [ -n "$p" ]
         do
-          catlin validate "$(workspaces.source.path)"/"$p" >> "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
-          echo "" >> "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
+          catlin validate "$(workspaces.source.path)"/"$p" >> "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE" 2>&1
+          echo "" >> "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE"
         done < "$INPUT_FILE"
-        echo "--------catlin output--------"
-        cat "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
-        echo "------catlin output end------"
-        STR=$(cat "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE")
+
+        echo ""
+        echo "--------------------------------CATLIN OUTPUT START------------------------------------------"
+        echo ""
+        cat "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE"
+        echo "--------------------------------CATLIN OUTPUT END--------------------------------------------"
+        echo ""
+        
+        STR=$(cat "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE")
         ERROR='ERROR'
         WARN='WARN'
-        if [[ "$STR" == *"$ERROR"* ]]; then
-          echo "failure" | tr -d "\n" | tee $(results.catlin-status.path)
+        
+        if [[ "$IGNORE_WARNINGS" == "true" ]]; then
+          echo "Ignore Warnings is set to true, any warnings in catlin output will be ignored"
+        fi
+
+        if [[ "$STR" == *"$ERROR"* || "$STR" == *"Error"* ]]; then
+          echo "failure" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
-          echo "catlin lint failed since one of the files has ERROR in its output"
+          echo "catlin lint failed since one of the files Errored out. Please check the pod logs for more details"
           exit 1
-        elif [[ "$STR" == *"$WARN"* ]]; then
-          echo "warning" | tr -d "\n" | tee $(results.catlin-status.path)
+        elif [[ "$STR" == *"$WARN"* && "$IGNORE_WARNINGS" == "false" ]]; then
+          echo "warning" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
           echo "catlin lint is warning since one of the files has WARNING in its output"
         else
-          echo "success" | tr -d "\n" | tee $(results.catlin-status.path)
+          echo "success" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
           echo "catlin lint success"
         fi

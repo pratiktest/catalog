@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: catlin-run
+  name: catlin-run-error
 spec:
   taskRef:
     name: catlin-validate

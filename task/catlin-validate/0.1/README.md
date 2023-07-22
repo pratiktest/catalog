@@ -10,10 +10,10 @@
 ### Run catlin validate to quickly validate a sample task
 * Imagine you are developing a task and you quickly want to run a catlin validate to check if this task can be submitted to the tekton catalog
 * Without downloading catlin or having any knowledge on how to run catlin you can check if your task passes all catlin checks by simply running a taskrun
-* A working taskrun is provided in the [samples](../0.1/samples/taskrun-success.yaml) section. 
-* [This](../0.1/samples/taskrun-success.yaml) taskrun validates a sample hello task. 
-* The hello task yaml which we want to validate is injected in the source workspace in the appropriate folder structure using  [this](../0.1/samples/source-success-configmap.yaml) configMap.
-* The filepath of the hello.yaml is supplied as a catlin-input using [this](../0.1/samples/input-configmap.yaml) configMap
+* A working taskrun is provided in the [tests](../0.1/tests/taskrun-success.yaml) folder. 
+* [This](../0.1/tests/taskrun-success.yaml) taskrun validates a sample hello task. 
+* The hello task yaml which we want to validate is injected in the source workspace in the appropriate folder structure using  [this](../0.1/tests/source-success-configmap.yaml) configMap.
+* The filepath of the hello.yaml is supplied as a catlin-input using [this](../0.1/tests/input-configmap.yaml) configMap
 * Thus without knowing anything about how to run catlin validate you can quickly lint your task yaml by simply following above steps
 
 ### Integrate catlin as a part of CI/CD pipelines for task
@@ -34,15 +34,18 @@
 ### outputFile 
 Name of the file that holds catlin validate output for each task. This file will be available in [catlin-output](#catlin-output) workspace
 ### inputFile
-File that contains catlin input. This file contains relative paths to the task yaml's delimited by newline. Paths should adhere to the tekton task catalog standards. Check [input-configmap](../0.1/samples/input-configmap.yaml) for an example of an inputFile
+File that contains catlin input. This file contains relative paths to the task yaml's delimited by newline. Paths should adhere to the tekton task catalog standards. Check [input-configmap](../0.1/tests/input-configmap.yaml) for an example of an inputFile
+
+### ignoreWarnings
+Ignores any warnings in catlin output. If catlin output has only success and warnings, all warnings are ignored and final catlin output will be success
 
 
 ## Workspaces
 
 ### source
-This workspace contains files on which catlin will be run. This can be the git repo of your tekton catalog. task yamls in this folder should have a path that follows tekton-catalog folder structure. Check [this](../0.1/samples/source-success-configmap.yaml) configmap and how it is injected into the cource workspace in [this](../0.1/samples/taskrun-success.yaml) taskrun as an example
+This workspace contains files on which catlin will be run. This can be the git repo of your tekton catalog. task yamls in this folder should have a path that follows tekton-catalog folder structure. Check [this](../0.1/tests/source-success-configmap.yaml) configmap and how it is injected into the cource workspace in [this](../0.1/tests/taskrun-success.yaml) taskrun as an example
 ### catlin-input
-A workspace that contains [$(params.inputFile)](#inputfile) Check [this](../0.1/samples/input-configmap.yaml) configmap and how it is injected onto the catlin-input workspace in [this](../0.1/samples/taskrun-success.yaml) taskrun as an example
+A workspace that contains [$(params.inputFile)](#inputfile) Check [this](../0.1/tests/input-configmap.yaml) configmap and how it is injected onto the catlin-input workspace in [this](../0.1/tests/taskrun-success.yaml) taskrun as an example
 ### catlin-output
 A workspace that contains output of catlin validate. Output of each catlin validate command is sent to [$(params.outputFle)](#outputfile) in this workspace
 
@@ -61,14 +64,14 @@ A workspace that contains output of catlin validate. Output of each catlin valid
 The Task can be run on `linux/amd64` platform.
 
 ## Example
-* [Samples](../0.1/samples) folder contains an example which you can use as a reference to create a taskrun that will lint your task before submitting it to a tekton catalog
+* [tests](../0.1/tests) folder contains an example which you can use as a reference to create a taskrun that will lint your task before submitting it to a tekton catalog
 * You will need a kubernetes cluster to test the catlin task. You can use [minikube](https://minikube.sigs.k8s.io/docs/start/) or [Kind](https://kind.sigs.k8s.io/) to install a kubernetes cluster locally.
 
 ### Catlin Validate Success
 * Follow the below steps to run the sample taskrun in your local cluster which validates a properly constructed task that adheres to catlin linting standards
 ```
 git clone https://github.com/tektoncd/catalog.git
-cd catalog/task/catlin-validate/0.1/samples
+cd catalog/task/catlin-validate/0.1/tests
 kubectl apply -f input-configmap.yaml
 kubectl apply -f source-success-configmap.yaml
 kubectl create -f taskrun-success.yaml
@@ -89,7 +92,7 @@ FILE: /workspace/source/task/hello/0.1/hello.yaml
 * **Note** Warning will not fail the task. Task will still succeed but with [catlin-status](#catlin-status) as warning
 ```
 git clone https://github.com/tektoncd/catalog.git
-cd catalog/task/catlin-validate/0.1/samples
+cd catalog/task/catlin-validate/0.1/tests
 kubectl apply -f input-configmap.yaml
 kubectl apply -f source-warn-configmap.yaml
 kubectl create -f taskrun-warn.yaml
@@ -111,7 +114,7 @@ WARN : Step "echo" uses image "$(params.image)" that contains variables; skippin
 * **Note** Error will result in [catlin-status](#catlin-status) having the value as failure.
 ```
 git clone https://github.com/tektoncd/catalog.git
-cd catalog/task/catlin-validate/0.1/samples
+cd catalog/task/catlin-validate/0.1/tests
 kubectl apply -f input-configmap.yaml
 kubectl apply -f source-error-configmap.yaml
 kubectl create -f taskrun-error.yaml

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: catlin-run
+  name: catlin-run-warn
 spec:
   taskRef:
     name: catlin-validate
@@ -17,7 +17,7 @@ spec:
         name: catlin-input
     - name: source
       configmap:
-        name: source-success
+        name: source-warn
         items:
         - key: "hello.yaml"
           path: "task/hello/0.1/hello.yaml"
