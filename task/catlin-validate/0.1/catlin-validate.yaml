@@ -59,17 +59,17 @@ spec:
         value: $(params.inputFile)
       workingDir: $(workspaces.catlin-input.path)
       script: |
-        #!/bin/bash
-        rm -rf $(workspaces.catlin-output.path)/$OUTPUT_FILE
+        #!/usr/bin/env bash
+        rm -rf "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
         while IFS="" read -r p || [ -n "$p" ]
         do
-          catlin validate $(workspaces.source.path)/$p >> $(workspaces.catlin-output.path)/$OUTPUT_FILE
-          echo "" >> $(workspaces.catlin-output.path)/$OUTPUT_FILE
-        done < $INPUT_FILE
-        echo "-------catlin output--------"
-        cat $(workspaces.catlin-output.path)/$OUTPUT_FILE
-        echo "-------catlin output end--------"
-        STR=$(cat $(workspaces.catlin-output.path)/$OUTPUT_FILE)
+          catlin validate "$(workspaces.source.path)"/"$p" >> "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
+          echo "" >> "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
+        done < "$INPUT_FILE"
+        echo "--------catlin output--------"
+        cat "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE"
+        echo "------catlin output end------"
+        STR=$(cat "$(workspaces.catlin-output.path)"/"$OUTPUT_FILE")
         ERROR='ERROR'
         WARN='WARN'
         if [[ "$STR" == *"$ERROR"* ]]; then
