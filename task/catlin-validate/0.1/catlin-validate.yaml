@@ -56,7 +56,7 @@ spec:
   - name: catlin-output
     description: This workspace is where catlin output will be stored
   steps:
-    - name: catlin
+    - name: catlin-validate
       image: gcr.io/tekton-releases/dogfooding/catlin:v20230721-0755082305@sha256:8db5e290b9a1b7794c536dbc826bb9cf3eeb82c41b251b7caee12204bcfb6664
       env:
       - name: OUTPUT_FILE
@@ -70,7 +70,7 @@ spec:
       workingDir: $(workspaces.catlin-input.path)
       script: |
         #!/usr/bin/env bash
-        rm -rf "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE"
+        rm -rf "${CATLIN_OUTPUT_WORKSPACE_PATH:?}"/"$OUTPUT_FILE"
         while IFS="" read -r p || [ -n "$p" ]
         do
           catlin validate "$(workspaces.source.path)"/"$p" >> "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE" 2>&1
@@ -83,7 +83,7 @@ spec:
         cat "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE"
         echo "--------------------------------CATLIN OUTPUT END--------------------------------------------"
         echo ""
-        
+
         STR=$(cat "$CATLIN_OUTPUT_WORKSPACE_PATH"/"$OUTPUT_FILE")
         ERROR='ERROR'
         WARN='WARN'
