@@ -95,16 +95,16 @@ spec:
         if [[ "$STR" == *"$ERROR"* || "$STR" == *"Error"* ]]; then
           echo "failure" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
-          echo "catlin lint failed since one of the files Errored out. Please check the pod logs for more details"
+          echo "Final output of catlin validate is failed since one of the files Errored out."
           exit 1
         elif [[ "$STR" == *"$WARN"* && "$IGNORE_WARNINGS" == "false" ]]; then
           echo "warning" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
-          echo "catlin lint is warning since one of the files has WARNING in its output"
+          echo "Final output of catlin validate is warning since one of the files has WARNING in its output."
         else
           echo "success" | tr -d "\n" > "$(results.catlin-status.path)"
           echo ""
-          echo "catlin lint success"
+          echo "Final output of catlin validate is success."
         fi
        
 
